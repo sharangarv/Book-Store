@@ -1,0 +1,40 @@
+{% extends "books/base.html" %}
+
+{% block title %}{{ book.title }}{% endblock %}
+
+{% block content %}
+<a href="/" class="back-link">← Back to all books</a>
+
+<div class="detail-card">
+  <img src="{{ book.image_url }}" alt="{{ book.title }}"
+       onerror="this.src='https://via.placeholder.com/220x300?text=No+Image'">
+
+  <div class="detail-content">
+    <h1>{{ book.title }}</h1>
+    <div class="price">£{{ book.price }}</div>
+
+    {% if book.description %}
+      <p class="desc">{{ book.description }}</p>
+    {% endif %}
+
+    <table class="meta-table">
+      <tr><td>Category</td>     <td>{{ book.category }}</td></tr>
+      <tr><td>Rating</td>       <td>
+        {% for i in "12345" %}
+          {% if forloop.counter <= book.rating_num %}⭐{% endif %}
+        {% endfor %}
+        ({{ book.rating }})
+      </td></tr>
+      <tr><td>Availability</td> <td>{{ book.availability }}</td></tr>
+      <tr><td>Price</td>        <td>£{{ book.price }}</td></tr>
+      <tr><td>Reviews</td>      <td>{{ book.num_reviews }}</td></tr>
+      <tr><td>UPC</td>          <td>{{ book.upc }}</td></tr>
+      <tr><td>Source</td>
+        <td><a href="{{ book.book_url }}" target="_blank" style="color:#e74c3c;">
+          View on site ↗
+        </a></td>
+      </tr>
+    </table>
+  </div>
+</div>
+{% endblock %}

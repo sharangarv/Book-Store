@@ -1,0 +1,76 @@
+{% extends "books/base.html" %}
+
+{% block title %}Books DB — {{ total }} Books{% endblock %}
+
+{% block content %}
+<form method="get" class="toolbar">
+  <input type="text" name="q" value="{{ query }}" placeholder="Search title, description, category...">
+  <select name="category">
+    <option value="">All Categories</option>
+    {% for cat in categories %}
+      <option value="{{ cat }}" {% if cat == category %}selected{% endif %}>{{ cat }}</option>
+    {% endfor %}
+  </select>
+  <select name="rating">
+    <option value="">All Ratings</option>
+    {% for i in "12345" %}
+      <option value="{{ i }}" {% if rating == i %}selected{% endif %}>{{ i }} ⭐</option>
+    {% endfor %}
+  </select>
+  <select name="sort">
+    <option value="title"      {% if sort == 'title'      %}selected{% endif %}>Sort: Title</option>
+    <option value="price_asc"  {% if sort == 'price_asc'  %}selected{% endif %}>Sort: Price ↑</option>
+    <option value="price_desc" {% if sort == 'price_desc' %}selected{% endif %}>Sort: Price ↓</option>
+    <option value="rating"     {% if sort == 'rating'     %}selected{% endif %}>Sort: Rating</option>
+  </select>
+  <button type="submit">Search</button>
+  {% if query or category or rating %}
+    <a href="/" class="clear">✕ Clear</a>
+  {% endif %}
+</form>
+
+<p class="stats">
+  Showing {{ page_obj.paginator.count }} of {{ total }} books
+  {% if query %}— matching "<strong>{{ query }}</strong>"{% endif %}
+  {% if category %}— in <strong>{{ category }}</strong>{% endif %}
+  {% if rating %}— rated <strong>{{ rating }}⭐</strong>{% endif %}
+</p>
+
+<div class="grid">
+{% for book in page_obj %}
+  <div class="book-card">
+    <img src="{{ book.image_url }}" alt="{{ book.title }}"
+         onerror="this.src='https://via.placeholder.com/220x200?text=No+Image'">
+    <div class="info">
+      <h3><a href="/{{ book.pk }}/">{{ book.title|truncatechars:60 }}</a></h3>
+      <div class="price">£{{ book.price }}</div>
+      <div class="meta">
+        <span class="badge">{{ book.category }}</span>
+        <span class="stars">
+          {% for i in "12345" %}
+            {% if forloop.counter <= book.rating_num %}⭐{% endif %}
+          {% endfor %}
+        </span>
+        <span>{{ book.availability }}</span>
+      </div>
+    </div>
+  </div>
+{% empty %}
+  <p style="text-align:center;color:#888;grid-column:1/-1;margin-top:40px;">
+    No books found.
+  </p>
+{% endfor %}
+</div>
+
+{% if page_obj.paginator.num_pages > 1 %}
+<div class="pagination">
+  {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}&q={{ query }}&category={{ category }}&rating={{ rating }}&sort={{ sort }}">← Prev</a>
+  {% endif %}
+  <span class="current">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}&q={{ query }}&category={{ category }}&rating={{ rating }}&sort={{ sort }}">Next →</a>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}
